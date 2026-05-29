@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Working with AI — PostFinance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFFFFF; --paper-2:#F4F6F5; --paper-3:#EDF1F0;
+    --petrol:#00514E; --petrol-deep:#062E2C; --petrol-soft:#3E726F;
+    --yellow:#FFCC00; --yellow-deep:#8a6d00;
+    --grapefruit:#F86B5A; --lightblue:#A6D8E7;
+    --ink:#0E2625; --ink-soft:#4d6361; --ink-faint:#7d908e;
+    --green:#2f7d54; --amber:#C08600; --red:#C5402F;
+    --line:rgba(6,46,44,.12); --line-strong:rgba(6,46,44,.24);
+    --display:"Bricolage Grotesque",sans-serif; --body:"Hanken Grotesk",sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+    --maxw:1120px; --r:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+  a{color:inherit}
+  .mono{font-family:var(--mono);font-size:.72em;letter-spacing:.04em;text-transform:uppercase}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand svg{display:block;border-radius:7px}
+  .brand .wm{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.02em;color:var(--petrol)}
+  .navright{display:flex;align-items:center;gap:28px}
+  .navlinks{display:flex;gap:24px;font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase}
+  .navlinks a{text-decoration:none;color:var(--ink-soft);padding-bottom:3px;border-bottom:2px solid transparent;transition:.2s}
+  .navlinks a:hover{color:var(--petrol);border-color:var(--yellow)}
+  .lang{display:inline-flex;border:1.5px solid var(--petrol);border-radius:30px;overflow:hidden;font-family:var(--mono);font-size:11px;letter-spacing:.05em}
+  .lang button{border:none;background:none;cursor:pointer;padding:6px 12px;color:var(--petrol);font-weight:500}
+  .lang button.on{background:var(--petrol);color:#fff}
+  @media(max-width:820px){.navlinks{display:none}}
+
+  /* HERO */
+  header{position:relative;overflow:hidden;padding:96px 0 76px}
+  .qcircle{position:absolute;top:-60px;right:-60px;width:420px;height:420px;background:var(--yellow);border-bottom-left-radius:100%;z-index:0}
+  .qcircle.two{width:230px;height:230px;top:150px;right:230px;background:var(--lightblue);border-radius:100% 0 100% 100%;opacity:.55}
+  @media(max-width:760px){.qcircle{width:230px;height:230px;top:-40px;right:-50px}.qcircle.two{display:none}}
+  header .wrap{position:relative;z-index:2}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--petrol);margin-bottom:26px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .eyebrow .ver{border:1px solid var(--line-strong);border-radius:30px;padding:3px 12px;color:var(--ink-soft)}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(42px,7vw,88px);line-height:1.0;letter-spacing:-.03em;max-width:16ch;color:var(--petrol)}
+  h1 em{font-style:normal;background:var(--yellow);color:var(--petrol-deep);padding:0 .12em;border-radius:.1em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+  .lede{font-size:clamp(19px,2.3vw,23px);color:var(--ink-soft);max-width:54ch;margin-top:28px;line-height:1.5}
+
+  .doors{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:52px}
+  @media(max-width:680px){.doors{grid-template-columns:1fr}}
+  .door{border:1px solid var(--line-strong);border-radius:var(--r);padding:28px;text-decoration:none;background:var(--paper);transition:transform .25s,box-shadow .25s,border-color .25s;position:relative;overflow:hidden}
+  .door::before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:var(--accentc,var(--petrol))}
+  .door.eng{--accentc:var(--petrol)} .door.every{--accentc:var(--grapefruit)}
+  .door:hover{transform:translateY(-4px);box-shadow:0 18px 40px -22px rgba(6,46,44,.5);border-color:var(--accentc)}
+  .door .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+  .door h3{font-family:var(--display);font-weight:700;font-size:27px;margin:10px 0 7px;letter-spacing:-.02em;color:var(--petrol)}
+  .door p{font-size:15.5px;color:var(--ink-soft);line-height:1.45}
+  .door .arrow{margin-top:18px;font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accentc);font-weight:500}
+
+  /* SECTION SHELL */
+  section{padding:80px 0;border-top:1px solid var(--line)}
+  section.alt{background:var(--paper-2)}
+  .sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:14px;flex-wrap:wrap}
+  .sec-num{font-family:var(--mono);font-size:13px;color:var(--grapefruit);letter-spacing:.08em;font-weight:500}
+  .sec-head h2{font-family:var(--display);font-weight:700;font-size:clamp(29px,4.2vw,44px);letter-spacing:-.03em;line-height:1.04;color:var(--petrol)}
+  .sec-sub{color:var(--ink-soft);max-width:62ch;font-size:18px;margin-bottom:42px}
+
+  /* PRINCIPLES */
+  .principles{display:grid;gap:0}
+  .principle{display:grid;grid-template-columns:70px 1fr;gap:22px;padding:26px 0;border-bottom:1px solid var(--line);align-items:start}
+  .principle:last-child{border-bottom:none}
+  .principle .pn{font-family:var(--display);font-size:34px;font-weight:700;color:var(--yellow-deep);line-height:1}
+  .principle h4{font-family:var(--display);font-weight:600;font-size:23px;letter-spacing:-.01em;margin-bottom:5px;color:var(--petrol)}
+  .principle p{color:var(--ink-soft);font-size:17px;max-width:66ch}
+
+  /* TRAFFIC LIGHT */
+  .lights{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:780px){.lights{grid-template-columns:1fr}}
+  .light{border:1px solid var(--line-strong);border-radius:var(--r);padding:26px;background:var(--paper);position:relative;overflow:hidden}
+  .light::before{content:"";position:absolute;top:0;left:0;right:0;height:6px}
+  .light .bead{width:16px;height:16px;border-radius:50%;display:inline-block;margin-bottom:14px;margin-top:6px}
+  .light.g::before{background:var(--green)} .light.g .bead{background:var(--green);box-shadow:0 0 0 5px rgba(47,125,84,.16)}
+  .light.a::before{background:var(--amber)} .light.a .bead{background:var(--amber);box-shadow:0 0 0 5px rgba(192,134,0,.16)}
+  .light.r::before{background:var(--red)}   .light.r .bead{background:var(--red);box-shadow:0 0 0 5px rgba(197,64,47,.16)}
+  .light h4{font-family:var(--display);font-weight:700;font-size:21px;color:var(--petrol)}
+  .light .verdict{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:16px}
+  .light ul{list-style:none;font-size:15.5px;color:var(--ink-soft)}
+  .light li{padding:8px 0 8px 22px;position:relative;border-top:1px solid var(--line);line-height:1.4}
+  .light li:first-child{border-top:none}
+  .light li::before{content:"";position:absolute;left:0;top:15px;width:8px;height:8px;border-radius:2px}
+  .light.g li::before{background:var(--green)} .light.a li::before{background:var(--amber)} .light.r li::before{background:var(--red)}
+  .note{margin-top:24px;font-size:15px;color:var(--petrol-soft);border-left:4px solid var(--yellow);padding:10px 0 10px 18px;background:rgba(255,204,0,.08);border-radius:0 8px 8px 0}
+  .note b{color:var(--petrol)}
+
+  /* AUTONOMY */
+  .ladder{display:grid;gap:0;border:1px solid var(--line-strong);border-radius:var(--r);overflow:hidden;background:var(--paper)}
+  .rung{display:grid;grid-template-columns:120px 1fr 1fr;gap:0;border-top:1px solid var(--line)}
+  .rung:first-child{border-top:none}
+  .rung .lvl{padding:24px 20px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px;justify-content:center}
+  .rung .lvl b{font-family:var(--display);font-size:15px;font-weight:700;color:var(--petrol-deep);background:var(--yellow);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .rung .lvl span{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink-soft);text-transform:uppercase}
+  .rung .what{padding:24px 22px;border-right:1px solid var(--line)}
+  .rung .what h4{font-family:var(--display);font-weight:600;font-size:19px;margin-bottom:4px;color:var(--petrol)}
+  .rung .what p{font-size:15px;color:var(--ink-soft);line-height:1.42}
+  .rung .who{padding:24px 22px;font-size:14.5px;color:var(--ink-soft)}
+  .rung .who .tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:6px}
+  @media(max-width:780px){.rung{grid-template-columns:92px 1fr}.rung .who{grid-column:1/-1;border-top:1px solid var(--line)}}
+  .ladder-rule{margin-top:24px;font-family:var(--display);font-size:21px;font-weight:500;color:var(--petrol);max-width:64ch;line-height:1.3}
+  .ladder-rule span{background:var(--yellow);padding:0 .1em;border-radius:.08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+  /* ANTI */
+  .anti{display:grid;grid-template-columns:1fr 1fr;gap:14px 36px}
+  @media(max-width:680px){.anti{grid-template-columns:1fr}}
+  .anti .row{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:18px 0;border-bottom:1px solid var(--line);align-items:start}
+  .anti .x{color:var(--grapefruit);font-family:var(--display);font-size:22px;line-height:1;font-weight:700}
+  .anti .row b{font-family:var(--display);font-weight:600;font-size:18px;color:var(--petrol)}
+  .anti .row p{font-size:15px;color:var(--ink-soft);margin-top:3px}
+
+  /* TIPS */
+  .toggle{display:inline-flex;border:1.5px solid var(--petrol);border-radius:40px;padding:4px;margin-bottom:36px;background:var(--paper)}
+  .toggle button{font-family:var(--mono);font-size:12px;letter-spacing:.05em;text-transform:uppercase;border:none;background:none;cursor:pointer;padding:9px 22px;border-radius:30px;color:var(--petrol);transition:.2s;font-weight:500}
+  .toggle button.on{background:var(--yellow);color:var(--petrol-deep)}
+  .tip{border:1px solid var(--line-strong);border-radius:var(--r);padding:24px;background:var(--paper)}
+  .tip .n{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--grapefruit);font-weight:500}
+  .tip h4{font-family:var(--display);font-weight:600;font-size:19px;margin:8px 0 6px;color:var(--petrol)}
+  .tip p{font-size:15.5px;color:var(--ink-soft);line-height:1.45}
+  .tip code{font-family:var(--mono);font-size:13px;background:var(--paper-3);padding:1px 6px;border-radius:4px;color:var(--petrol)}
+  .lane{display:none}.lane.show{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:880px){.lane.show{grid-template-columns:1fr 1fr}}
+  @media(max-width:600px){.lane.show{grid-template-columns:1fr}}
+
+  /* FAQ */
+  .faq{border-top:1px solid var(--line-strong)}
+  .qa{border-bottom:1px solid var(--line)}
+  .qa button{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:24px 44px 24px 0;font-family:var(--display);font-weight:600;font-size:21px;color:var(--petrol);position:relative;letter-spacing:-.01em;line-height:1.3}
+  .qa button::after{content:"+";position:absolute;right:6px;top:22px;font-family:var(--display);font-size:26px;color:var(--yellow-deep);transition:transform .3s;font-weight:500}
+  .qa.open button::after{transform:rotate(45deg)}
+  .qa .ans{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .qa .ans p{padding:0 44px 26px 0;color:var(--ink-soft);font-size:16.5px;max-width:74ch}
+  .qa .ans .ph{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);border:1px dashed var(--amber);border-radius:4px;padding:1px 7px;margin-left:6px;white-space:nowrap}
+
+  /* FOOTER */
+  footer{position:relative;overflow:hidden;background:var(--petrol-deep);color:#dfeae8;padding:72px 0 84px}
+  .fcircle{position:absolute;bottom:-90px;left:-60px;width:300px;height:300px;background:rgba(255,204,0,.10);border-radius:50%;z-index:0}
+  footer .wrap{position:relative;z-index:2}
+  footer .grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:36px}
+  @media(max-width:680px){footer .grid{grid-template-columns:1fr}}
+  footer h4{font-family:var(--display);font-weight:700;font-size:24px;margin-bottom:12px;color:#fff;letter-spacing:-.02em}
+  footer p,footer li{color:#b8cecb;font-size:15.5px;line-height:1.55}
+  footer ul{list-style:none}
+  footer .mono{color:var(--yellow);margin-bottom:10px;font-weight:500}
+  footer a{color:var(--yellow);text-decoration:none;border-bottom:1px solid rgba(255,204,0,.35)}
+  .living{margin-top:44px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+  .living span{color:#7fa29e}
+
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  [data-d="1"]{transition-delay:.08s}[data-d="2"]{transition-delay:.16s}[data-d="3"]{transition-delay:.24s}[data-d="4"]{transition-delay:.32s}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <!-- BRAND: replace this inline SVG mark with the official PostFinance logo SVG from the brand portal before publishing -->
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 26 26" aria-label="PostFinance"><rect width="26" height="26" rx="7" fill="#FFCC00"/><path d="M10.8 5h4.4v5.8H21v4.4h-5.8V21h-4.4v-5.8H5v-4.4h5.8z" fill="#062E2C"/></svg>
+      <span class="wm">PostFinance</span>
+    </div>
+    <div class="navright">
+      <div class="navlinks">
+        <a href="#principles" data-i18n="nav1">Principles</a>
+        <a href="#data" data-i18n="nav2">Data</a>
+        <a href="#autonomy" data-i18n="nav3">Autonomy</a>
+        <a href="#anti" data-i18n="nav4">Anti-patterns</a>
+        <a href="#tips" data-i18n="nav5">Tips</a>
+        <a href="#faq" data-i18n="nav6">FAQ</a>
+      </div>
+      <div class="lang">
+        <button id="lang-en" class="on" onclick="setLang('en')">EN</button>
+        <button id="lang-de" onclick="setLang('de')">DE</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="qcircle"></div>
+  <div class="qcircle two"></div>
+  <div class="wrap">
+    <div class="eyebrow reveal in"><span data-i18n="eyebrow">STOB · AI Circle · Working with AI</span> <span class="ver" data-i18n="ver">v0.1 · draft</span></div>
+    <h1 class="reveal in" data-d="1" data-i18n="h1">Use the models. <em>Own</em> the output.</h1>
+    <p class="lede reveal in" data-d="2" data-i18n="lede">A shared, tool-agnostic guide for everyone working with large language models here. The principles hold whichever assistant you use. The responsibility stays with you.</p>
+
+    <div class="doors">
+      <a href="#tips" class="door eng reveal in" data-d="3" onclick="setLane('tech')">
+        <div class="k" data-i18n="d1k">Start here if</div>
+        <h3 data-i18n="d1h">I write code</h3>
+        <p data-i18n="d1p">Engineers, data and platform teams using assistants and agents in the build.</p>
+        <div class="arrow" data-i18n="d1a">Go to the engineering lane →</div>
+      </a>
+      <a href="#tips" class="door every reveal in" data-d="4" onclick="setLane('biz')">
+        <div class="k" data-i18n="d2k">Start here if</div>
+        <h3 data-i18n="d2h">I don't write code</h3>
+        <p data-i18n="d2p">Everyone using AI for drafting, analysis, research, communication and decisions.</p>
+        <div class="arrow" data-i18n="d2a">Go to the everyday lane →</div>
+      </a>
+    </div>
+  </div>
+</header>
+
+<section id="principles">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">01</span><h2 data-i18n="ph">Six principles that don't change</h2></div>
+    <p class="sec-sub reveal" data-i18n="psub">Whatever the tool, whatever the task. If you remember nothing else, remember these.</p>
+    <div class="principles">
+      <div class="principle reveal"><div class="pn">01</div><div><h4 data-i18n="p1h">You own the output</h4><p data-i18n="p1p">The model assists. It does not take accountability. Your name is on the work, so the judgement has to be yours.</p></div></div>
+      <div class="principle reveal"><div class="pn">02</div><div><h4 data-i18n="p2h">Verify before you trust</h4><p data-i18n="p2p">Treat every answer as a confident draft, not a fact. Check the numbers, the code, the citation. Models are fluent in being wrong.</p></div></div>
+      <div class="principle reveal"><div class="pn">03</div><div><h4 data-i18n="p3h">Classify before you paste</h4><p data-i18n="p3p">Know what kind of data you are about to hand over. When in doubt, it is red. See the traffic light below.</p></div></div>
+      <div class="principle reveal"><div class="pn">04</div><div><h4 data-i18n="p4h">Use sanctioned tools only</h4><p data-i18n="p4p">Work data goes into approved channels, never a personal account. Convenience is not a justification for shadow AI.</p></div></div>
+      <div class="principle reveal"><div class="pn">05</div><div><h4 data-i18n="p5h">Keep a human in the loop</h4><p data-i18n="p5p">Scale oversight to risk. The bigger the blast radius, the closer the supervision. See the autonomy ladder.</p></div></div>
+      <div class="principle reveal"><div class="pn">06</div><div><h4 data-i18n="p6h">Be transparent and explainable</h4><p data-i18n="p6p">Disclose AI assistance where it affects others, and be able to explain how a result was reached. If you cannot explain it, you cannot defend it.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="data" class="alt">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">02</span><h2 data-i18n="dh">Can I paste this?</h2></div>
+    <p class="sec-sub reveal" data-i18n="dsub">The one question that matters most in a bank. Match what you are about to enter to the strictest category it touches.</p>
+    <div class="lights">
+      <div class="light g reveal"><span class="bead"></span><h4 data-i18n="lg">Green</h4><div class="verdict" data-i18n="lgv">Free to use</div>
+        <ul><li data-i18n="lg1">Public information and documentation</li><li data-i18n="lg2">Generic, boilerplate code with no secrets</li><li data-i18n="lg3">Fully anonymised or synthetic data</li><li data-i18n="lg4">General how-to and conceptual questions</li></ul>
+      </div>
+      <div class="light a reveal" data-d="1"><span class="bead"></span><h4 data-i18n="la">Amber</h4><div class="verdict" data-i18n="lav">Approved channel only</div>
+        <ul><li data-i18n="la1">Internal, non-sensitive documents</li><li data-i18n="la2">Internal code without credentials or keys</li><li data-i18n="la3">Draft internal communications</li><li data-i18n="la4">Anonymised analyses and aggregates</li></ul>
+      </div>
+      <div class="light r reveal" data-d="2"><span class="bead"></span><h4 data-i18n="lr">Red</h4><div class="verdict" data-i18n="lrv">Never</div>
+        <ul><li data-i18n="lr1">Client data and any personal data (PII)</li><li data-i18n="lr2">Account, payment or transaction detail</li><li data-i18n="lr3">Credentials, keys, secrets, tokens</li><li data-i18n="lr4">Anything under banking secrecy or legal privilege</li></ul>
+      </div>
+    </div>
+    <p class="note reveal" data-i18n="dnote"><b>Placeholder for governance.</b> The exact boundary between amber and red, the list of approved channels, and the binding wording on banking secrecy (Art. 47 BankG) and FADP/revDSG are set by Legal, Compliance and the AI Circle. This card is the plain-language version, not the policy of record.</p>
+  </div>
+</section>
+
+<section id="autonomy">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">03</span><h2 data-i18n="ah">How much should the model do alone?</h2></div>
+    <p class="sec-sub reveal" data-i18n="asub">A shared vocabulary for delegation. The right level depends on what breaks if it goes wrong.</p>
+    <div class="ladder">
+      <div class="rung reveal"><div class="lvl"><b>L1</b><span data-i18n="r1l">Assist</span></div><div class="what"><h4 data-i18n="r1h">Suggest, you decide</h4><p data-i18n="r1p">Brainstorming, drafting, explaining. The model proposes; you write and own every word.</p></div><div class="who"><span class="tag" data-i18n="tag">Oversight</span><span data-i18n="r1w">You check everything. Default for most everyday work.</span></div></div>
+      <div class="rung reveal"><div class="lvl"><b>L2</b><span data-i18n="r2l">Co-pilot</span></div><div class="what"><h4 data-i18n="r2h">Produce, you review</h4><p data-i18n="r2p">The model generates code or content; nothing is used until you have read and understood it.</p></div><div class="who"><span class="tag" data-i18n="tag2">Oversight</span><span data-i18n="r2w">Review every output before it ships. Review diffs, not vibes.</span></div></div>
+      <div class="rung reveal"><div class="lvl"><b>L3</b><span data-i18n="r3l">Supervised agent</span></div><div class="what"><h4 data-i18n="r3h">Execute with checkpoints</h4><p data-i18n="r3p">Multi-step tasks run, but stop for your approval at defined gates and before any consequential action.</p></div><div class="who"><span class="tag" data-i18n="tag3">Oversight</span><span data-i18n="r3w">Approve at checkpoints. Only for reversible, well-scoped tasks.</span></div></div>
+      <div class="rung reveal"><div class="lvl"><b>L4</b><span data-i18n="r4l">Autonomous</span></div><div class="what"><h4 data-i18n="r4h">Runs unattended</h4><p data-i18n="r4p">Operates inside hard guardrails without step-by-step approval.</p></div><div class="who"><span class="tag" data-i18n="tag4">Oversight</span><span data-i18n="r4w">Only for low-risk, reversible, monitored, logged work. Requires sign-off.</span></div></div>
+    </div>
+    <p class="ladder-rule reveal" data-i18n="arule">The rule: <span>permitted autonomy scales inversely with blast radius, data sensitivity and irreversibility.</span></p>
+  </div>
+</section>
+
+<section id="anti" class="alt">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">04</span><h2 data-i18n="xh">How this goes wrong</h2></div>
+    <p class="sec-sub reveal" data-i18n="xsub">The failure modes we have all seen. Naming them is half the defence.</p>
+    <div class="anti">
+      <div class="row reveal"><div class="x">✕</div><div><b data-i18n="x1b">Shadow AI</b><p data-i18n="x1p">Pasting work data into a personal account because it was faster. Speed is not a policy.</p></div></div>
+      <div class="row reveal"><div class="x">✕</div><div><b data-i18n="x2b">Prompt and pray</b><p data-i18n="x2p">Accepting output with no review step. The review step is the work.</p></div></div>
+      <div class="row reveal"><div class="x">✕</div><div><b data-i18n="x3b">Shipping what you can't explain</b><p data-i18n="x3p">If you could not have written it without the model, you are not yet ready to ship it.</p></div></div>
+      <div class="row reveal"><div class="x">✕</div><div><b data-i18n="x4b">Confidence as correctness</b><p data-i18n="x4p">A fluent, certain answer is not a verified one. Hallucination sounds exactly like expertise.</p></div></div>
+      <div class="row reveal"><div class="x">✕</div><div><b data-i18n="x5b">Over-automating the irreversible</b><p data-i18n="x5p">Letting an agent take actions that cannot be undone without a human gate.</p></div></div>
+      <div class="row reveal"><div class="x">✕</div><div><b data-i18n="x6b">Letting the model set the requirements</b><p data-i18n="x6p">It is good at answers, not at deciding what the question should have been.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="tips">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">05</span><h2 data-i18n="th">Getting better results</h2></div>
+    <p class="sec-sub reveal" data-i18n="tsub">Practical habits. Pick your lane.</p>
+    <div class="toggle reveal">
+      <button id="b-biz" class="on" onclick="setLane('biz')" data-i18n="tbiz">Everyday use</button>
+      <button id="b-tech" onclick="setLane('tech')" data-i18n="ttech">Engineering</button>
+    </div>
+
+    <div id="lane-biz" class="lane show">
+      <div class="tip"><div class="n">01</div><h4 data-i18n="bt1h">Give it a role and context</h4><p data-i18n="bt1p">"You are a compliance reviewer. Here is the draft. Flag risks." Context beats cleverness.</p></div>
+      <div class="tip"><div class="n">02</div><h4 data-i18n="bt2h">Show one good example</h4><p data-i18n="bt2p">One sample of the tone or format you want teaches more than three paragraphs of instruction.</p></div>
+      <div class="tip"><div class="n">03</div><h4 data-i18n="bt3h">Ask for the format you need</h4><p data-i18n="bt3p">Table, bullet list, three options, 80 words. Say it up front and you save a round trip.</p></div>
+      <div class="tip"><div class="n">04</div><h4 data-i18n="bt4h">Iterate in small steps</h4><p data-i18n="bt4p">Refine one thing at a time. Big rewrites hide the change you actually wanted.</p></div>
+      <div class="tip"><div class="n">05</div><h4 data-i18n="bt5h">Make it critique itself</h4><p data-i18n="bt5p">"What is weak about this answer?" often surfaces the flaw you would have missed.</p></div>
+      <div class="tip"><div class="n">06</div><h4 data-i18n="bt6h">Never assume it knows our facts</h4><p data-i18n="bt6p">It does not know our products, our clients or our numbers. If it states one, you provided it or it invented it.</p></div>
+    </div>
+
+    <div id="lane-tech" class="lane">
+      <div class="tip"><div class="n">01</div><h4 data-i18n="tt1h">Give it the real context</h4><p data-i18n="tt1p">Relevant files, interfaces, constraints and the existing patterns. A model with no repo context guesses.</p></div>
+      <div class="tip"><div class="n">02</div><h4 data-i18n="tt2h">Ask for a plan before code</h4><p data-i18n="tt2p">Have it outline the approach first. Cheaper to correct a plan than a diff.</p></div>
+      <div class="tip"><div class="n">03</div><h4 data-i18n="tt3h">Specify constraints and tests</h4><p data-i18n="tt3p">State the contract: inputs, edge cases, the test that must pass. Better still, write the test first.</p></div>
+      <div class="tip"><div class="n">04</div><h4 data-i18n="tt4h">Review diffs, not output</h4><p data-i18n="tt4p">Read what changed, line by line. <code>git diff</code> is your review surface, not the chat window.</p></div>
+      <div class="tip"><div class="n">05</div><h4 data-i18n="tt5h">Keep secrets out of the loop</h4><p data-i18n="tt5p">No keys, tokens or prod data in prompts, configs or context files. Assume the transcript is logged.</p></div>
+      <div class="tip"><div class="n">06</div><h4 data-i18n="tt6h">Pin and log the model</h4><p data-i18n="tt6p">Record which model and version produced what. Reproducibility and audit start here.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="alt">
+  <div class="wrap">
+    <div class="sec-head reveal"><span class="sec-num">06</span><h2 data-i18n="fh">Questions people actually ask</h2></div>
+    <div class="faq reveal">
+      <div class="qa"><button data-i18n="q1">Is my data used to train the model?</button><div class="ans"><p data-i18n="a1">It depends entirely on the tool and the contract behind it. In sanctioned enterprise tooling this is typically switched off by agreement. In a personal consumer account, assume the opposite. The specific terms for each approved channel<span class="ph">placeholder · AI Circle</span> are the source of truth.</p></div></div>
+      <div class="qa"><button data-i18n="q2">Which tools am I actually allowed to use?</button><div class="ans"><p data-i18n="a2">Only those on the approved list, used through the sanctioned channel.<span class="ph">placeholder · approved list</span> If a tool is not on it, it is not approved, however good it is.</p></div></div>
+      <div class="qa"><button data-i18n="q3">Can I use it for client-facing communication?</button><div class="ans"><p data-i18n="a3">For drafting and structuring, yes, with review. Never paste client data to do it, and never send anything you have not read and stand behind. The model drafts; you are accountable for what goes out.</p></div></div>
+      <div class="qa"><button data-i18n="q4">What about generated code, licences and IP?</button><div class="ans"><p data-i18n="a4">Treat generated code as your code: review it for security, licence and quality before it enters the codebase. The responsibility for what you merge is yours, not the model's.</p></div></div>
+      <div class="qa"><button data-i18n="q5">It gave me a confident wrong answer. Is that normal?</button><div class="ans"><p data-i18n="a5">Yes. Models produce plausible text, which is not the same as correct text. This is why verification is a principle and not a suggestion.</p></div></div>
+      <div class="qa"><button data-i18n="q6">Can I just use my personal ChatGPT for work?</button><div class="ans"><p data-i18n="a6">No. That is shadow AI and it puts data outside our control. Use the sanctioned channel even when it is slower.</p></div></div>
+      <div class="qa"><button data-i18n="q7">Is this going to replace my job?</button><div class="ans"><p data-i18n="a7">It changes the work more than it removes it. The skill that matters is shifting from producing to directing and judging. People who learn to direct these tools well will be the ones in demand.</p></div></div>
+      <div class="qa"><button data-i18n="q8">Who do I ask when I am not sure?</button><div class="ans"><p data-i18n="a8">The AI Gilde for practice and how-to, the AI Circle for governance and approvals.<span class="ph">placeholder · contacts</span> When unsure about data, stop and ask before you paste.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fcircle"></div>
+  <div class="wrap">
+    <div class="grid">
+      <div>
+        <h4 data-i18n="fl1h">A living document</h4>
+        <p data-i18n="fl1p">This guide is maintained by the STOB AI Circle and refined with the AI Gilde. It will change as the tools, the contracts and the regulation change. The principles will move more slowly than the tips.</p>
+      </div>
+      <div>
+        <div class="mono" data-i18n="fl2h">Governance</div>
+        <ul><li data-i18n="fl2a">AI Circle, alignment, transparency, focus</li><li data-i18n="fl2b">AI Gilde, practice and enablement</li><li data-i18n="fl2c">Legal and Compliance, binding policy</li></ul>
+      </div>
+      <div>
+        <div class="mono" data-i18n="fl3h">Contribute</div>
+        <ul><li data-i18n="fl3a">Found something wrong or missing?</li><li><a href="#" data-i18n="fl3b">Open a suggestion →</a></li><li data-i18n="fl3c">Disagreeing in good faith is welcome.</li></ul>
+      </div>
+    </div>
+    <div class="living">
+      <span data-i18n="lv1">Version 0.1 · draft for review</span>
+      <span data-i18n="lv2">Tool-agnostic · for everyone at PostFinance</span>
+      <span class="date" data-i18n="lv3">Last updated · </span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var DE = {
+    nav1:"Grundsätze",nav2:"Daten",nav3:"Autonomie",nav4:"Anti-Muster",nav5:"Tipps",nav6:"FAQ",
+    eyebrow:"STOB · AI Circle · Arbeiten mit KI",ver:"v0.1 · Entwurf",
+    h1:"Nutze die Modelle. <em>Verantworte</em> das Ergebnis.",
+    lede:"Ein gemeinsamer, werkzeugunabhängiger Leitfaden für alle, die hier mit grossen Sprachmodellen arbeiten. Die Grundsätze gelten unabhängig vom Assistenten. Die Verantwortung bleibt bei dir.",
+    d1k:"Beginne hier, wenn",d1h:"Ich schreibe Code",d1p:"Engineering-, Daten- und Plattformteams, die Assistenten und Agenten in der Entwicklung einsetzen.",d1a:"Zur Engineering-Spur →",
+    d2k:"Beginne hier, wenn",d2h:"Ich schreibe keinen Code",d2p:"Alle, die KI für Entwürfe, Analysen, Recherche, Kommunikation und Entscheidungen nutzen.",d2a:"Zur Alltags-Spur →",
+    ph:"Sechs Grundsätze, die bleiben",psub:"Welches Werkzeug, welche Aufgabe auch immer. Wenn du dir nur eines merkst, dann diese.",
+    p1h:"Du verantwortest das Ergebnis",p1p:"Das Modell unterstützt. Die Verantwortung übernimmt es nicht. Dein Name steht auf der Arbeit, also muss das Urteil deins sein.",
+    p2h:"Prüfe, bevor du vertraust",p2p:"Behandle jede Antwort als selbstbewussten Entwurf, nicht als Tatsache. Prüfe die Zahlen, den Code, die Quelle. Modelle formulieren Fehler souverän.",
+    p3h:"Klassifiziere, bevor du einfügst",p3p:"Wisse, welche Art von Daten du gleich weitergibst. Im Zweifel ist es rot. Siehe die Ampel unten.",
+    p4h:"Nutze nur freigegebene Werkzeuge",p4p:"Geschäftsdaten gehören in freigegebene Kanäle, nie in ein privates Konto. Bequemlichkeit rechtfertigt keine Schatten-KI.",
+    p5h:"Behalte den Menschen in der Schleife",p5p:"Skaliere die Aufsicht nach dem Risiko. Je grösser die Tragweite, desto enger die Kontrolle. Siehe die Autonomie-Leiter.",
+    p6h:"Sei transparent und nachvollziehbar",p6p:"Lege KI-Unterstützung offen, wo sie andere betrifft, und sei in der Lage zu erklären, wie ein Ergebnis zustande kam. Was du nicht erklären kannst, kannst du nicht vertreten.",
+    dh:"Darf ich das einfügen?",dsub:"Die wichtigste Frage in einer Bank. Ordne das, was du eingeben willst, der strengsten zutreffenden Kategorie zu.",
+    lg:"Grün",lgv:"Frei verwendbar",lg1:"Öffentliche Informationen und Dokumentation",lg2:"Generischer Standardcode ohne Geheimnisse",lg3:"Vollständig anonymisierte oder synthetische Daten",lg4:"Allgemeine Anleitungs- und Konzeptfragen",
+    la:"Gelb",lav:"Nur über freigegebenen Kanal",la1:"Interne, nicht sensible Dokumente",la2:"Interner Code ohne Zugangsdaten oder Schlüssel",la3:"Entwürfe interner Kommunikation",la4:"Anonymisierte Analysen und Aggregate",
+    lr:"Rot",lrv:"Niemals",lr1:"Kundendaten und alle Personendaten (PII)",lr2:"Konto-, Zahlungs- oder Transaktionsdaten",lr3:"Zugangsdaten, Schlüssel, Geheimnisse, Tokens",lr4:"Alles unter Bankkundengeheimnis oder anwaltlicher Verschwiegenheit",
+    dnote:"<b>Platzhalter für die Governance.</b> Die genaue Grenze zwischen Gelb und Rot, die Liste der freigegebenen Kanäle und der verbindliche Wortlaut zum Bankkundengeheimnis (Art. 47 BankG) sowie zum DSG/revDSG werden von Legal, Compliance und dem AI Circle festgelegt. Diese Karte ist die verständliche Fassung, nicht die massgebende Richtlinie.",
+    ah:"Wie viel soll das Modell allein tun?",asub:"Ein gemeinsames Vokabular für das Delegieren. Die richtige Stufe hängt davon ab, was kaputtgeht, wenn es schiefläuft.",
+    r1l:"Assistenz",r1h:"Vorschlagen, du entscheidest",r1p:"Brainstorming, Entwürfe, Erklärungen. Das Modell schlägt vor; du schreibst und verantwortest jedes Wort.",tag:"Aufsicht",r1w:"Du prüfst alles. Standard für die meiste Alltagsarbeit.",
+    r2l:"Co-Pilot",r2h:"Erstellen, du prüfst",r2p:"Das Modell erzeugt Code oder Inhalte; nichts wird verwendet, bevor du es gelesen und verstanden hast.",tag2:"Aufsicht",r2w:"Prüfe jedes Ergebnis vor dem Einsatz. Prüfe Diffs, nicht Bauchgefühl.",
+    r3l:"Beaufsichtigter Agent",r3h:"Ausführen mit Kontrollpunkten",r3p:"Mehrstufige Aufgaben laufen, halten aber an definierten Punkten und vor jeder folgenreichen Aktion für deine Freigabe an.",tag3:"Aufsicht",r3w:"Freigabe an Kontrollpunkten. Nur für umkehrbare, klar abgegrenzte Aufgaben.",
+    r4l:"Autonom",r4h:"Läuft unbeaufsichtigt",r4p:"Arbeitet innerhalb harter Leitplanken ohne schrittweise Freigabe.",tag4:"Aufsicht",r4w:"Nur für risikoarme, umkehrbare, überwachte und protokollierte Arbeit. Erfordert eine Freigabe.",
+    arule:"Die Regel: <span>die erlaubte Autonomie steht im umgekehrten Verhältnis zu Tragweite, Datensensibilität und Unumkehrbarkeit.</span>",
+    xh:"Wie es schiefgeht",xsub:"Die Fehlermuster, die wir alle kennen. Sie zu benennen ist die halbe Abwehr.",
+    x1b:"Schatten-KI",x1p:"Geschäftsdaten in ein privates Konto einfügen, weil es schneller ging. Tempo ist keine Richtlinie.",
+    x2b:"Prompt und hoffen",x2p:"Ergebnisse ohne Prüfschritt übernehmen. Der Prüfschritt ist die Arbeit.",
+    x3b:"Ausliefern, was du nicht erklären kannst",x3p:"Wenn du es ohne das Modell nicht hättest schreiben können, bist du noch nicht bereit, es auszuliefern.",
+    x4b:"Selbstsicherheit als Richtigkeit",x4p:"Eine flüssige, sichere Antwort ist keine geprüfte. Halluzination klingt genau wie Fachwissen.",
+    x5b:"Das Unumkehrbare überautomatisieren",x5p:"Einen Agenten Aktionen ausführen lassen, die sich ohne menschliche Freigabe nicht rückgängig machen lassen.",
+    x6b:"Das Modell die Anforderungen setzen lassen",x6p:"Es ist gut in Antworten, nicht darin zu entscheiden, wie die Frage hätte lauten sollen.",
+    th:"Bessere Ergebnisse erzielen",tsub:"Praktische Gewohnheiten. Wähle deine Spur.",tbiz:"Alltag",ttech:"Engineering",
+    bt1h:"Gib ihm Rolle und Kontext",bt1p:"«Du bist Compliance-Prüfer. Hier ist der Entwurf. Markiere Risiken.» Kontext schlägt Cleverness.",
+    bt2h:"Zeig ein gutes Beispiel",bt2p:"Ein Muster des gewünschten Tons oder Formats lehrt mehr als drei Absätze Anweisung.",
+    bt3h:"Verlange das Format, das du brauchst",bt3p:"Tabelle, Liste, drei Optionen, 80 Wörter. Sag es vorab und du sparst eine Runde.",
+    bt4h:"Iteriere in kleinen Schritten",bt4p:"Verbessere eine Sache nach der anderen. Grosse Umschriebe verstecken die Änderung, die du wolltest.",
+    bt5h:"Lass es sich selbst kritisieren",bt5p:"«Was ist an dieser Antwort schwach?» bringt oft den Mangel zum Vorschein, den du übersehen hättest.",
+    bt6h:"Nimm nie an, dass es unsere Fakten kennt",bt6p:"Es kennt unsere Produkte, Kunden und Zahlen nicht. Nennt es eine, dann hast du sie geliefert oder es hat sie erfunden.",
+    tt1h:"Gib ihm den echten Kontext",tt1p:"Relevante Dateien, Schnittstellen, Vorgaben und die bestehenden Muster. Ein Modell ohne Repo-Kontext rät.",
+    tt2h:"Verlange einen Plan vor dem Code",tt2p:"Lass es zuerst den Ansatz skizzieren. Einen Plan zu korrigieren ist billiger als ein Diff.",
+    tt3h:"Lege Vorgaben und Tests fest",tt3p:"Definiere den Vertrag: Eingaben, Randfälle, den Test, der bestehen muss. Besser noch, schreib den Test zuerst.",
+    tt4h:"Prüfe Diffs, nicht Output",tt4p:"Lies Zeile für Zeile, was sich geändert hat. <code>git diff</code> ist deine Prüffläche, nicht das Chatfenster.",
+    tt5h:"Halte Geheimnisse draussen",tt5p:"Keine Schlüssel, Tokens oder Produktivdaten in Prompts, Konfigurationen oder Kontextdateien. Geh davon aus, dass das Protokoll gespeichert wird.",
+    tt6h:"Modell fixieren und protokollieren",tt6p:"Halte fest, welches Modell und welche Version was erzeugt hat. Reproduzierbarkeit und Audit beginnen hier.",
+    fh:"Fragen, die wirklich gestellt werden",
+    q1:"Werden meine Daten zum Training des Modells verwendet?",a1:"Das hängt ganz vom Werkzeug und dem dahinterstehenden Vertrag ab. In freigegebenen Unternehmenswerkzeugen ist dies vertraglich meist deaktiviert. Bei einem privaten Konto nimm das Gegenteil an. Massgebend sind die konkreten Bedingungen jedes freigegebenen Kanals<span class=\"ph\">Platzhalter · AI Circle</span>.",
+    q2:"Welche Werkzeuge darf ich tatsächlich nutzen?",a2:"Nur die auf der Freigabeliste, genutzt über den freigegebenen Kanal.<span class=\"ph\">Platzhalter · Freigabeliste</span> Steht ein Werkzeug nicht darauf, ist es nicht freigegeben, so gut es auch sein mag.",
+    q3:"Darf ich es für Kundenkommunikation nutzen?",a3:"Für Entwürfe und Struktur ja, mit Prüfung. Füge dafür nie Kundendaten ein und versende nie etwas, das du nicht gelesen hast und vertrittst. Das Modell entwirft; du verantwortest, was hinausgeht.",
+    q4:"Was ist mit generiertem Code, Lizenzen und IP?",a4:"Behandle generierten Code wie deinen Code: prüfe ihn auf Sicherheit, Lizenz und Qualität, bevor er in die Codebasis kommt. Die Verantwortung für das, was du mergst, liegt bei dir, nicht beim Modell.",
+    q5:"Es gab mir eine selbstsichere falsche Antwort. Ist das normal?",a5:"Ja. Modelle erzeugen plausiblen Text, was nicht dasselbe ist wie richtiger Text. Darum ist Prüfen ein Grundsatz und keine Empfehlung.",
+    q6:"Darf ich einfach mein privates ChatGPT für die Arbeit nutzen?",a6:"Nein. Das ist Schatten-KI und bringt Daten ausserhalb unserer Kontrolle. Nutze den freigegebenen Kanal, auch wenn er langsamer ist.",
+    q7:"Wird das meinen Job ersetzen?",a7:"Es verändert die Arbeit mehr, als dass es sie wegnimmt. Die entscheidende Fähigkeit verschiebt sich vom Produzieren zum Steuern und Beurteilen. Gefragt sind die, die diese Werkzeuge gut steuern lernen.",
+    q8:"Wen frage ich, wenn ich unsicher bin?",a8:"Die AI Gilde für Praxis und Anleitung, den AI Circle für Governance und Freigaben.<span class=\"ph\">Platzhalter · Kontakte</span> Bei Unsicherheit über Daten: anhalten und fragen, bevor du einfügst.",
+    fl1h:"Ein lebendiges Dokument",fl1p:"Dieser Leitfaden wird vom STOB AI Circle gepflegt und mit der AI Gilde verfeinert. Er ändert sich, wenn sich Werkzeuge, Verträge und Regulierung ändern. Die Grundsätze bewegen sich langsamer als die Tipps.",
+    fl2h:"Governance",fl2a:"AI Circle, Alignment, Transparenz, Fokus",fl2b:"AI Gilde, Praxis und Enablement",fl2c:"Legal und Compliance, verbindliche Richtlinie",
+    fl3h:"Mitwirken",fl3a:"Etwas falsch oder fehlt?",fl3b:"Vorschlag einreichen →",fl3c:"Begründeter Widerspruch ist willkommen.",
+    lv1:"Version 0.1 · Entwurf zur Prüfung",lv2:"Werkzeugunabhängig · für alle bei PostFinance",lv3:"Zuletzt aktualisiert · "
+  };
+  var EN = {};
+  var lang = "en";
+
+  function captureEN(){ document.querySelectorAll("[data-i18n]").forEach(function(el){ EN[el.getAttribute("data-i18n")] = el.innerHTML; }); }
+  function stampDate(){
+    var d = new Date();
+    var loc = lang === "de" ? "de-CH" : "en-CH";
+    var s = d.toLocaleDateString(loc,{year:"numeric",month:"long",day:"numeric"});
+    var base = (lang==="de"?DE.lv3:EN.lv3);
+    var node = document.querySelector(".date"); if(node) node.innerHTML = base + s;
+  }
+  function setLang(l){
+    lang = l;
+    var dict = l === "de" ? DE : EN;
+    document.querySelectorAll("[data-i18n]").forEach(function(el){
+      var k = el.getAttribute("data-i18n");
+      if(dict[k] !== undefined) el.innerHTML = dict[k];
+    });
+    document.documentElement.lang = l;
+    document.getElementById("lang-en").classList.toggle("on", l==="en");
+    document.getElementById("lang-de").classList.toggle("on", l==="de");
+    stampDate();
+  }
+
+  function setLane(which){
+    document.getElementById("lane-biz").classList.toggle("show", which==="biz");
+    document.getElementById("lane-tech").classList.toggle("show", which==="tech");
+    document.getElementById("b-biz").classList.toggle("on", which==="biz");
+    document.getElementById("b-tech").classList.toggle("on", which==="tech");
+  }
+
+  document.querySelectorAll(".qa button").forEach(function(b){
+    b.addEventListener("click",function(){
+      var qa=b.parentElement, ans=qa.querySelector(".ans"), open=qa.classList.contains("open");
+      document.querySelectorAll(".qa").forEach(function(o){o.classList.remove("open");o.querySelector(".ans").style.maxHeight=null;});
+      if(!open){qa.classList.add("open");ans.style.maxHeight=ans.scrollHeight+"px";}
+    });
+  });
+
+  // In-page navigation by script. Reliable everywhere, including iframes.
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener("click",function(e){
+      e.preventDefault();
+      var id=a.getAttribute("href").slice(1);
+      if(!id) return;
+      var t=document.getElementById(id);
+      if(t) t.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+  });
+
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target);}});},{threshold:.12});
+  document.querySelectorAll(".reveal:not(.in)").forEach(function(el){io.observe(el);});
+
+  captureEN();
+  stampDate();
+</script>
+</body>
+</html>
